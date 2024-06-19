@@ -53,6 +53,6 @@ minio:
   bucket-name: ${spring.application.name}
 aliyun:
   sms:
-    access-key-id: LTAI5tQhJvkZtABQYSn6g3v9
-    access-key-secret: SaRiO4uVYwHRP9VOHg1Aerj6Y1S0wk
+    access-key-id: <your accessKeyId>
+    access-key-secret: <your accessKeySecret>
     endpoint: dysmsapi.aliyuncs.com
