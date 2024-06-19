@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjw.lease.web.app.mapper.LeaseAgreementMapper">
+
+    <resultMap id="AgreementItemVoMap" type="com.zjw.lease.web.app.vo.agreement.AgreementItemVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection property="roomGraphVoList" ofType="com.zjw.lease.web.app.vo.graph.GraphVo" autoMapping="true"/>
+    </resultMap>
+
+    <select id="listItemByPhone" resultMap="AgreementItemVoMap">
+        SELECT la.id,
+               la.lease_start_date,
+               la.lease_end_date,
+               la.rent,
+               la.payment_type_id,
+               la.status lease_status,
+               la.source_type,
+               ai.name   apartment_name,
+               ri.room_number,
+               gi.name,
+               gi.url
+        FROM lease_agreement la
+                 LEFT JOIN apartment_info ai ON la.apartment_id = ai.id AND ai.is_deleted = 0
+                 LEFT JOIN room_info ri ON la.room_id = ri.id AND ri.is_deleted = 0
+                 LEFT JOIN graph_info gi ON gi.item_type = 2 AND gi.item_id = ri.id AND gi.is_deleted = 0
+        WHERE la.is_deleted = 0
+          AND la.phone = #{phone}
+    </select>
+</mapper>

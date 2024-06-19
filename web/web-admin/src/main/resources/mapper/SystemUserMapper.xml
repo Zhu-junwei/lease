@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjw.lease.web.admin.mapper.SystemUserMapper">
+
+    <select id="selectSystemUserItemVoByPage"
+            resultType="com.zjw.lease.web.admin.vo.system.user.SystemUserItemVo">
+        SELECT su.id,
+               username,
+               su.name,
+               type,
+               phone,
+               avatar_url,
+               additional_info,
+               post_id,
+               su.status,
+               sp.name post_name
+        FROM system_user su
+                 LEFT JOIN system_post sp ON su.post_id = sp.id AND sp.is_deleted = 0
+        <where>
+            su.is_deleted = 0
+            <if test="queryVo.name != null and queryVo.name != ''">
+                AND su.name LIKE concat('%',#{queryVo.name},'%')
+            </if>
+            <if test="queryVo.phone !=null and queryVo.phone != ''">
+                AND su.phone LIKE concat('%',#{queryVo.phone},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

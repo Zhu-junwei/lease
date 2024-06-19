@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjw.lease.web.admin.mapper.ViewAppointmentMapper">
+
+    <resultMap id="AppointmentVoMap" type="com.zjw.lease.web.admin.vo.appointment.AppointmentVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="apartmentInfo" javaType="com.zjw.lease.model.entity.ApartmentInfo" autoMapping="true">
+            <id property="id" column="apartment_id"/>
+            <result property="name" column="apartment_name"/>
+        </association>
+    </resultMap>
+
+    <select id="pageAppointmentVo" resultMap="AppointmentVoMap">
+        SELECT va.id,
+               va.user_id,
+               va.name,
+               va.phone,
+               va.appointment_time,
+               va.additional_info,
+               va.appointment_status,
+               ai.id   apartment_id,
+               ai.name apartment_name,
+               ai.district_id,
+               ai.district_name,
+               ai.city_id,
+               ai.city_name,
+               ai.province_id,
+               ai.province_name
+        FROM view_appointment va
+                 LEFT JOIN
+             apartment_info ai
+             ON va.apartment_id = ai.id AND ai.is_deleted = 0
+        <where>
+            va.is_deleted = 0
+            <if test="queryVo.provinceId != null">
+                AND ai.province_id = #{queryVo.provinceId}
+            </if>
+            <if test="queryVo.cityId != null">
+                AND ai.city_id = #{queryVo.cityId}
+            </if>
+            <if test="queryVo.districtId != null">
+                AND ai.district_id = #{queryVo.districtId}
+            </if>
+            <if test="queryVo.apartmentId != null">
+                AND va.apartment_id = #{queryVo.apartmentId}
+            </if>
+            <if test="queryVo.name != null and queryVo.name != ''">
+                AND va.name like concat('%',#{queryVo.name},'%')
+            </if>
+            <if test="queryVo.phone != null and queryVo.phone != ''">
+                AND va.phone like concat('%',#{queryVo.phone},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

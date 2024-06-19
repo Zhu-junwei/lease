@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjw.lease.web.admin.mapper.ApartmentInfoMapper">
+
+    <select id="pageApartmentItemByQuery" resultType="com.zjw.lease.web.admin.vo.apartment.ApartmentItemVo">
+        SELECT ai.id,
+               ai.name,
+               ai.introduction,
+               ai.district_id,
+               ai.district_name,
+               ai.city_id,
+               ai.city_name,
+               ai.province_id,
+               ai.province_name,
+               ai.address_detail,
+               ai.latitude,
+               ai.longitude,
+               ai.phone,
+               ai.is_release,
+               IFNULL(tc.cnt, 0)                     total_room_count,
+               IFNULL(tc.cnt, 0) - IFNULL(cc.cnt, 0) free_room_count
+        FROM (SELECT id,
+                     name,
+                     introduction,
+                     district_id,
+                     district_name,
+                     city_id,
+                     city_name,
+                     province_id,
+                     province_name,
+                     address_detail,
+                     latitude,
+                     longitude,
+                     phone,
+                     is_release
+              FROM apartment_info
+                <where>
+                    is_deleted=0
+                    <if test="queryVo.provinceId != null">
+                        and province_id=#{queryVo.provinceId}
+                    </if>
+                    <if test="queryVo.cityId != null">
+                        and city_id=#{queryVo.cityId}
+                    </if>
+                    <if test="queryVo.districtId != null">
+                        and district_id=#{queryVo.districtId}
+                    </if>
+                </where>) ai
+                 LEFT JOIN
+             (SELECT apartment_id,
+                     COUNT(*) cnt
+              FROM room_info
+              WHERE is_deleted = 0
+                AND is_release = 1
+              GROUP BY apartment_id) tc
+             ON ai.id = tc.apartment_id
+                 LEFT JOIN
+             (SELECT apartment_id,
+                     COUNT(*) cnt
+              FROM lease_agreement
+              WHERE is_deleted = 0
+                AND status IN (2, 5)
+              GROUP BY apartment_id) cc
+             ON ai.id = cc.apartment_id
+    </select>
+</mapper>

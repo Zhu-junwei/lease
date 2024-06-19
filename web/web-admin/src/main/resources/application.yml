@@ -1,0 +1,53 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: lease
+  datasource:
+    url: jdbc:mysql://mysql-termux:3306/lease?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
+    username: root
+    password: 123456
+    hikari:
+      connection-test-query: SELECT 1 # 自动检测连接
+      connection-timeout: 60000 #数据库连接超时时间,默认30秒
+      idle-timeout: 500000 #空闲连接存活最大时间，默认600000（10分钟）
+      max-lifetime: 540000 #此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      maximum-pool-size: 20 #连接池最大连接数，默认是10
+      minimum-idle: 15 #最小空闲连接数量
+      pool-name: LEASE-HikariPool # 连接池名称
+  data:
+    redis:
+      host: redis-termux
+      port: 6379
+      password: redis@123
+      database: 0 # 默认数据库为0
+      client-type: lettuce  # 客户端类型，默认为lettuce，可选jedis
+      lettuce:
+        pool:
+          max-active: 50 #最大活动连接，默认8个
+          min-idle: 10  #池中“空闲”连接的最大数目。默认0
+          max-idle: 50  #池中“空闲”连接的最大数目。使用负值表示空闲连接数不受限制，默认8
+          max-wait: 5000  # 当连接池耗尽时，在抛出异常之前，连接分配应该阻塞的最大时间。使用负值表示无限期阻塞。默认-1
+springdoc:
+  default-flat-param-object: true # 用于测试时将queryVo做打平处理
+
+# mybatis-plus orm配置
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: is_deleted # 全局逻辑删除字段名
+      logic-delete-value: 1 # 逻辑已删除值
+      logic-not-delete-value: 0 # 逻辑未删除值
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    # 用于打印框架生成的sql语句，便于调试
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    root: debug
+# minio 对象存储
+minio:
+  endpoint: http://minio-termux:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: ${spring.application.name}
